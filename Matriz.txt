@@ -1,0 +1,144 @@
+#include <Servo.h>
+
+
+#define R1 0
+#define R2 1
+#define R3 2
+#define R4 3
+
+#define C1 4
+#define C2 5
+#define C3 6
+#define C4 7
+
+#define VCC 8
+#define ret 100
+
+Servo myservo;
+
+int pulsoActual = 0;
+
+
+void setup() {
+  myservo.attach(11);
+  Serial.begin(9600);
+  pinMode(R1,INPUT);
+  pinMode(R2,INPUT);
+  pinMode(R3,INPUT);
+  pinMode(R4,INPUT);
+  attachInterrupt(R1, barridoR1, FALLING);
+  attachInterrupt(R2, barridoR2, FALLING);
+  attachInterrupt(R3, barridoR3, FALLING);
+  attachInterrupt(R4, barridoR4, FALLING);
+  pinMode(C1,OUTPUT);
+  pinMode(C2,OUTPUT);
+  pinMode(C3,OUTPUT);
+  pinMode(C4,OUTPUT);
+  pinMode(VCC,OUTPUT);
+  digitalWrite(VCC,HIGH);
+}
+
+void loop() {
+  pulso();
+}
+
+void pulso(){
+  mandaPulso(C1);
+  limpiar();
+  mandaPulso(C2);
+  limpiar();
+  mandaPulso(C3);
+  limpiar();
+  mandaPulso(C4);
+  limpiar();
+
+  if(Serial.available()){
+    delay(100);
+    String lectura = "";
+    while (Serial.available() > 0) {
+      char caracter = Serial.read();
+      lectura += caracter;
+    }
+    int pos = lectura.toInt();
+     
+  }
+  myservo.write(40);
+  delay(15);
+}
+
+void limpiar(){
+  digitalWrite(C1,HIGH);
+  digitalWrite(C2,HIGH);
+  digitalWrite(C3,HIGH);
+  digitalWrite(C4,HIGH);
+}
+
+void mandaPulso(int pin){
+  pulsoActual = pin;
+  digitalWrite(pin,LOW);
+  delay(ret);
+}
+
+void barridoR1(){
+  // Toma la informacion de la entrada
+  if(pulsoActual == C1){
+    imprimir('*');
+  }
+  if(pulsoActual == C2){
+    imprimir('0');
+  }
+  if(pulsoActual == C3){
+    imprimir('#');
+  }
+  if(pulsoActual == C4){
+    imprimir('D');
+  }
+}
+void barridoR2(){
+  if(pulsoActual == C1){
+    imprimir('7');
+  }
+  if(pulsoActual == C2){
+    imprimir('8');
+  }
+  if(pulsoActual == C3){
+    imprimir('9');
+  }
+  if(pulsoActual == C4){
+    imprimir('C');
+  }
+}
+
+void barridoR3(){
+  if(pulsoActual == C1){
+    imprimir('1');
+  }
+  if(pulsoActual == C2){
+    imprimir('2');
+  }
+  if(pulsoActual == C3){
+    imprimir('3');
+  }
+  if(pulsoActual == C4){
+    imprimir('A');
+  }
+}
+
+void barridoR4(){
+  if(pulsoActual == C1){
+    imprimir('4');
+  }
+  if(pulsoActual == C2){
+    imprimir('5');
+  }
+  if(pulsoActual == C3){
+    imprimir('6');
+  }
+  if(pulsoActual == C4){
+    imprimir('B');
+  }
+}
+
+void imprimir(char caracter){
+  Serial.print(caracter);
+}
